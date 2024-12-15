@@ -2,21 +2,6 @@
 
 from enum import Enum
 
-debug = []
-debug.append("----------")
-debug.append("----------")
-debug.append("----------")
-debug.append("----------")
-debug.append("----------")
-debug.append("----------")
-debug.append("----------")
-debug.append("----------")
-debug.append("----------")
-debug.append("----------")
-
-COLOR_NC="\x1b[0m" # No Color
-COLOR_RED="\x1b[31m"
-
 class DirX(Enum):
     W = 0
     MID = 1
@@ -37,16 +22,6 @@ class Direction(Enum):
     SW = 6
     W  = 7
     end = 8
-    @staticmethod
-    def buildDirection(dirx: type(DirX), diry: type(DirY)):
-        strdir = ""
-        if diry.name != "MID":
-            strdir += diry.name
-        if dirx.name != "MID":
-            strdir += dirx.name
-        if strdir == "":
-            return None
-        return Direction[strdir]
     @staticmethod
     def splitDirection(direction):
         name = direction.name
@@ -103,15 +78,6 @@ class Pattern:
             if self.foundLen == len(word) + start:
                 self.foundLen = start
                 return True
-                # total += 1
-                # while self.foundLen > 0:
-                #     self.foundLen -= 1
-                #     self.updatePtr()
-                #     debug[self.ptrY] = debug[self.ptrY][0:self.ptrX] + lines[self.ptrY][self.ptrX] + debug[self.ptrY][self.ptrX + 1:]
-                # for l in debug:
-                #     print(l)
-                # print("initialX:", self.xInitial, "; initialY:", self.yInitial)
-                # breakpoint()
         self.foundLen = start
         return False
     def lookForWords(self, aword: str, lines: list):
@@ -123,7 +89,6 @@ class Pattern:
                 total += 1
             if self.dirct.value < Direction.end.value:
                 self.dirct = Direction(self.dirct.value + 1)
-                # breakpoint()
             else:
                 quitt = True
     def updatePtr(self):
@@ -140,7 +105,6 @@ class Pattern:
             self.ptrY = self.yInitial + self.foundLen
         else:
             self.ptrY = self.yInitial
-    # returns True if out of bounds
     def isOutOfBounds(self, lines):
         if (self.ptrX < 0 or
             self.ptrY < 0 or
@@ -168,8 +132,6 @@ class CrossPattern(Pattern):
         quitt = False
         word = aword
         while not quitt:
-            # if(self.xInitial == 7 and self.yInitial == 1):
-            #     breakpoint()
             if self.lookForWord(word[1:], lines, 1):
                 self.xInitial0 = self.xInitial
                 self.yInitial0 = self.yInitial
@@ -183,7 +145,6 @@ class CrossPattern(Pattern):
 
                 amatch = False
                 j = 0
-                anciendebug = debug.copy()
                 while not amatch and j < len(possibility):
                     self.xInitial = possibility[j]['x']
                     self.yInitial = possibility[j]['y']
@@ -191,38 +152,14 @@ class CrossPattern(Pattern):
                     if self.lookForWord(word, lines, 0):
                         crossmatch += 1
                         amatch = True
-
-                    #     while self.foundLen > 0:
-                    #         self.foundLen -= 1
-                    #         self.updatePtr()
-                    #         debug[self.ptrY] = debug[self.ptrY][0:self.ptrX] + lines[self.ptrY][self.ptrX] + debug[self.ptrY][self.ptrX + 1:]
-                    #         anciendebug[self.ptrY] = anciendebug[self.ptrY][0:self.ptrX] + '-' + anciendebug[self.ptrY][self.ptrX + 1:]
                         self.foundLen = 1
                     j += 1
 
                 self.xInitial = self.xInitial0
                 self.yInitial = self.yInitial0
                 self.dirct = self.originalDir
-                # if amatch:
-                #     self.foundLen = 3
-
-                #     while self.foundLen > 0:
-                #         self.foundLen -= 1
-                #         self.updatePtr()
-                #         debug[self.ptrY] = debug[self.ptrY][0:self.ptrX] + lines[self.ptrY][self.ptrX] + debug[self.ptrY][self.ptrX + 1:]
-                #         anciendebug[self.ptrY] = anciendebug[self.ptrY][0:self.ptrX] + '-' + anciendebug[self.ptrY][self.ptrX + 1:]
-                #     self.foundLen = 1
-                #     for l in range(len(debug)):
-                #         for m in range(len(debug[l])):
-                #             if debug[l][m] != anciendebug[l][m]:
-                #                 print(COLOR_RED + debug[l][m] + COLOR_NC, sep="", end="")
-                #             else:
-                #                 print(debug[l][m], sep="", end="")
-                #         print("")
-                #     breakpoint()
             if self.dirct.value < Direction.W.value:
                 self.dirct = Direction(self.dirct.value + 2)
-                # breakpoint()
             else:
                 quitt = True
 
@@ -240,7 +177,6 @@ class Lines:
                     amatch = Pattern()
                     amatch.xInitial = x
                     amatch.yInitial = y
-                    # breakpoint()
                     amatch.lookForWords("MAS", self.l)
 
     def lookForMAS_cross(self):
@@ -250,7 +186,6 @@ class Lines:
                     amatch = CrossPattern()
                     amatch.xInitial = x
                     amatch.yInitial = y
-                    # breakpoint()
                     amatch.lookForCross("MAS", self.l)
 
 ln = Lines()
@@ -264,12 +199,8 @@ def readFile():
         ln.l = f.readlines()
 
 if __name__=="__main__":
-    # global ln
     readFile()
     ln.lookForXMAS()
     ln.lookForMAS_cross()
-    # global total
     print("Part1: Number of XMAS:", total)
     print("Part2: Number of X-MAS:", int(crossmatch / 2))
-    # for l in debug:
-    #     print(l)
